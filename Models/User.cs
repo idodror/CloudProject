@@ -1,6 +1,6 @@
 using System;
 
-namespace userService.Models {
+namespace CloudProject.Models {
     public class User {
         public string _id { get; set; }
         public string _rev { get; set; }

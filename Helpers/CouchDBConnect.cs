@@ -2,9 +2,9 @@ using System;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using userService.Models;
+using CloudProject.Models;
 
-namespace userService.Helpers
+namespace CloudProject.Helpers
 {
     public static class CouchDBConnect
     {

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using userService.Models;
+using CloudProject.Models;
 using System.Net.Http;
 using Newtonsoft.Json;
 
-namespace userService.Controllers
+namespace CloudProject.Controllers
 {
     [Route("api/[controller]")]
     public class Login : Controller
