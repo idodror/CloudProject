@@ -3,6 +3,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using CloudProject.Models;
+using System.Threading.Tasks;
 
 namespace CloudProject.Helpers
 {
@@ -12,10 +13,20 @@ namespace CloudProject.Helpers
     
         public static HttpClient GetClient(string db) {
             var hc = new HttpClient();
-            hc.BaseAddress = new Uri(string.Format(host, db));
+            hc.BaseAddress = new Uri(string.Format(host,db));
             hc.DefaultRequestHeaders.Clear();
-            hc.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            hc.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Console.WriteLine(hc.DefaultRequestHeaders);
             return hc;
+        }
+
+        public static async Task<HttpResponseMessage> PostToDB(object obj, string dbName)
+        {
+            var hc = Helpers.CouchDBConnect.GetClient(dbName);
+            string json = JsonConvert.SerializeObject(obj);
+            HttpContent htc = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            var response = await hc.PostAsync("", htc);
+            return response;
         }
     }
 }

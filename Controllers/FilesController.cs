@@ -9,37 +9,32 @@ using Newtonsoft.Json;
 
 namespace CloudProject.Controllers
 {
+    [Route("api/[controller]")]
     public class FilesController : Controller
     {
         [HttpPost]
-        [Route("/UploadFile")]
-        public async Task<int> UploadFile([FromBody]MyFileObject file) {
-
-            var hc = Helpers.CouchDBConnect.GetClient("files"); //need create db by named: "files"
-            string json = JsonConvert.SerializeObject(file);
-            HttpContent htc = new StringContent(json,System.Text.Encoding.UTF8,"application/json");
-            var response = await hc.PostAsync("",htc); //hc.PostAsync("files",htc)????
+        [Route("UploadFile")]
+        public async Task<int> UploadFile([FromBody]MyFile file) {
+            MyFileNoRev fileNoRev = new MyFileNoRev(file);
+            var response = await Helpers.CouchDBConnect.PostToDB(fileNoRev, "files");
             
-            Console.WriteLine(response); //Debug
+            Console.WriteLine(response);
             return 1;
         }
 
         [HttpGet]
-        [Route("/DownloadFile")]
-        public async Task<MyFileObject> DownloadFile([FromBody]MyFileObject file) {
+        [Route("DownloadFile/{id}")]
+        public async Task<MyFile> DownloadFile(string id) {
             var hc = Helpers.CouchDBConnect.GetClient("files");
-            var response = await hc.GetAsync("files/"+file.ID);
-            if (response.IsSuccessStatusCode) {
-                MyFileObject newFile = new MyFileObject();
-                newFile.ID=file.ID;
-                newFile.TypeFile=file.TypeFile;
-                newFile.NameFile=file.NameFile;
-                newFile.ByteFile=file.ByteFile;
-                
-                return newFile;
+            var response = await hc.GetAsync("/files/id:" + id);
+
+            if (!response.IsSuccessStatusCode) {
+                return null;
             }
+
+            var file = (MyFile) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(), typeof(MyFile));
             
-            return null;
+            return file;
         }
     }
 }

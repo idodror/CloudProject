@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,7 +50,7 @@ namespace CloudProject.Controllers
                 User user = (User)JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(), typeof(User));
                 if (user.password.Equals(u.password)) {
                     Token t = new Token();
-                    t._id = u._id + ":token" + Guid.NewGuid();
+                    t._id = "id:" + u._id + ":token:" + Guid.NewGuid();
                     t.create = DateTime.Now;
                     t.ttl = 600;
 
@@ -79,19 +79,21 @@ namespace CloudProject.Controllers
 
         [HttpPost]
         [Route("CreateUser")]
-        public async Task<int> CreateUser([FromBody] User u) {
+        public async Task<int> CreateUser([FromBody] User u)
+        {
             var doesExist = await DoesUserExist(u);
-            if (doesExist) {
+            if (doesExist)
+            {
                 return -1;
             }
-            var hc = Helpers.CouchDBConnect.GetClient("users");
-            string json = JsonConvert.SerializeObject(u);
-            HttpContent htc = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            var response = await hc.PostAsync("", htc);
-            
+
+            UserNoRev unr = new UserNoRev(u);
+            var response = await Helpers.CouchDBConnect.PostToDB(unr, "users");
+
             Console.WriteLine(response);
             return 1;
         }
+
 
         // PUT api/values/5
         [HttpPut("{id}")]
