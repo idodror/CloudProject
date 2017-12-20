@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -90,7 +90,6 @@ namespace CloudProject.Controllers
             var response = await hc.PostAsync("", htc);
             
             Console.WriteLine(response);
-
             return 1;
         }
 
