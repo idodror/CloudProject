@@ -14,8 +14,8 @@ namespace CloudProject.Controllers
     {
         [HttpPost]
         [Route("UploadFile")]
-        public async Task<int> UploadFile([FromBody]MyFile file) {
-            MyFileNoRev fileNoRev = new MyFileNoRev(file);
+        public async Task<int> UploadFile([FromBody]ImageFile file) {
+            ImageFileNoRev fileNoRev = new ImageFileNoRev(file);
             var response = await Helpers.CouchDBConnect.PostToDB(fileNoRev, "files");
             
             Console.WriteLine(response);
@@ -24,7 +24,7 @@ namespace CloudProject.Controllers
 
         [HttpGet]
         [Route("DownloadFile/{id}")]
-        public async Task<MyFile> DownloadFile(string id) {
+        public async Task<ImageFile> DownloadFile(string id) {
             var hc = Helpers.CouchDBConnect.GetClient("files");
             var response = await hc.GetAsync("/files/id:" + id);
 
@@ -32,7 +32,7 @@ namespace CloudProject.Controllers
                 return null;
             }
 
-            var file = (MyFile) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(), typeof(MyFile));
+            var file = (ImageFile) JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync(), typeof(ImageFile));
             
             return file;
         }
