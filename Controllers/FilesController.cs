@@ -46,24 +46,52 @@ namespace CloudProject.Controllers
 
         [HttpGet]
         [Route("GetList/{id}")] //all image by id (user)
-        public async Task<IEnumerable<ImageFile>> GetList(string id) {
+        public async Task<IEnumerable<ImageFile>> GetList(string id)
+        {
             var hc = CouchDBConnect.GetClient("files");
             List<ImageFile> imagesList = new List<ImageFile>();
             var response = await hc.GetAsync("/files/_all_docs?startkey=\"id:" + id + "\"&include_docs=true");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            await GetListFromDB(imagesList, response);
+
+            return imagesList;
+        }
+
+
+
+        [HttpGet]
+        [Route("Search/{id}/{fileName}")] //search by name of image file (per user)
+        public async Task<IEnumerable<ImageFile>> Search(string id,string fileName) {
+            var hc = Helpers.CouchDBConnect.GetClient("files");
+            var response = await hc.GetAsync("/files/_all_docs?startkey=\"id:" + id +":file:"+ fileName+ "\"&include_docs=true");
+            List<ImageFile> imagesList = new List<ImageFile>();
 
             if (!response.IsSuccessStatusCode) {
                     return null;
             }
 
+            await GetListFromDB(imagesList, response);
+
+            if(imagesList.Count>0)
+                return imagesList;
+
+            return null;
+        }
+
+        private static async Task GetListFromDB(List<ImageFile> imagesList, HttpResponseMessage response)
+        {
             var content = await response.Content.ReadAsStringAsync();
             string listData = JObject.Parse(content).ToString();
 
             var data = JsonImagesListHelper.FromJson(listData);     // make an object built from the json
 
-            foreach(var row in data.Rows) 
+            foreach (var row in data.Rows)
                 imagesList.Add(new ImageFile(row.Doc));
-            
-            return imagesList;
         }
     }     
         

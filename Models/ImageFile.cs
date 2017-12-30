@@ -10,6 +10,8 @@ namespace CloudProject.Models
         public string filetype { get; set; }    // .jpg .png .gif etc...
         public string data { get; set; }    // file as Base64
 
+        public ImageFile(){} //this fix the upload bug because the Helpers.ImageDoc doc is null
+
         public ImageFile(Helpers.ImageDoc doc) {
             _id = doc.Id;
             _rev = doc.Rev;
