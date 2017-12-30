@@ -1,3 +1,6 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace CloudProject.Models
 {
     public class ImageFile
@@ -6,6 +9,13 @@ namespace CloudProject.Models
         public string _rev { get; set; }
         public string filetype { get; set; }    // .jpg .png .gif etc...
         public string data { get; set; }    // file as Base64
+
+        public ImageFile(Helpers.ImageDoc doc) {
+            _id = doc.Id;
+            _rev = doc.Rev;
+            filetype = doc.Filetype;
+            data = doc.Data;
+        }
     }
 
     public class ImageFileNoRev
