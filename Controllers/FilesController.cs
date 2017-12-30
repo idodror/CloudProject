@@ -43,6 +43,26 @@ namespace CloudProject.Controllers
             return file;
         }
 
+        [HttpDelete]
+        [Route("Delete/{id}")]
+        public async Task<int> Delete(string id){
+            var hc = CouchDBConnect.GetClient("files");
+            ImageFile imageRemove=null;
+            imageRemove = await DownloadFile(id);
+
+            if(imageRemove!=null)
+            {
+                var response= await hc.DeleteAsync("/files/id:"+id+"?rev="+imageRemove._rev);
+
+                if (!response.IsSuccessStatusCode) {
+                    return -1;
+                }
+                    return 1;
+            }
+            
+            return -1;
+
+        }
 
         [HttpGet]
         [Route("GetList/{id}")] //all image by id (user)
