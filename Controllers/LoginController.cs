@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using CloudProject.Models;
+using CloudProject.Helpers;
 using System.Net.Http;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 
 namespace CloudProject.Controllers
 {
@@ -14,6 +16,27 @@ namespace CloudProject.Controllers
     {
         static Dictionary<string, Token> ActiveLogins = new Dictionary<string, Token>();
         static List<User> Users = new List<User>();
+
+        IDatabase cachingDB;
+
+        public Login (IRedisConnectionFactory caching) {
+            cachingDB = caching.Connection().GetDatabase();
+        }
+
+        [HttpPost]
+        [Route("/WriteToCache")]
+        public IEnumerable<String> WriteToCache([FromBody] Data data) {
+            cachingDB.StringSet(data.id.ToString(), Newtonsoft.Json.JsonConvert.SerializeObject(data));
+
+            return new List<string>{"ok"};
+        }
+
+        [HttpGet]
+        [Route("/ReadFromCache/{id:int}")]
+        public Data ReadFromCache(int id) {
+            Data d = Newtonsoft.Json.JsonConvert.DeserializeObject<Data>(cachingDB.StringGet(id.ToString()));
+            return d;
+        }
 
         // GET api/values/5
         [HttpGet("{id}")]
