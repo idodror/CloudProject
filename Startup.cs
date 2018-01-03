@@ -10,6 +10,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using CloudProject.Helpers;
+using RawRabbit.Configuration;
+using RawRabbit.DependencyInjection.ServiceCollection;
+using RawRabbit.Enrichers.GlobalExecutionId;
+using RawRabbit.Enrichers.HttpContext;
+using RawRabbit.Enrichers.MessageContext;
+using RawRabbit.Operations.MessageSequence;
+using RawRabbit.Operations.StateMachine;
+using RawRabbit.Instantiation;
+using RawRabbit.Enrichers.MessageContext.Context;
 
 namespace CloudProject
 {
@@ -26,6 +35,12 @@ namespace CloudProject
         public void ConfigureServices(IServiceCollection services)
         {
             services
+            .AddRawRabbit(new RawRabbitOptions {
+                ClientConfiguration = 
+                    RawRabbit.Common
+                    .ConnectionStringParser.Parse("pcwvalie:SMGHv_ilwrd9K1D9YlhZqSV-CvdIjjgt@golden-kangaroo.rmq.cloudamqp.com/pcwvalie"),
+                Plugins = p => p.UseGlobalExecutionId().UseMessageContext<MessageContext>()
+            })
             .AddSingleton<IRedisConnectionFactory,RedisConnectionFactory>()
             .AddMvc();
         }
