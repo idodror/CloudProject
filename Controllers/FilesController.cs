@@ -24,21 +24,24 @@ namespace CloudProject.Controllers
 
         public FilesController (IBusClient _client) {
             client = _client;
-            client.SubscribeAsync<ImageFile, MessageContext>((img, ctx) => {
-                // store image in database;
-                Console.WriteLine("Image id: {0}, fileType: {1}", img._id, img.filetype);
-                return Task.FromResult(0);
+            client.SubscribeAsync<ShareFileNoRev, MessageContext>(async (sfnr, ctx) => {
+                // download image and upload it with the new user as owner
+                ImageFile downloadedFile = await DownloadFile(sfnr.imgId);
+                int index = downloadedFile._id.LastIndexOf(':');
+                string newImgId = downloadedFile._id.Substring(0, index+1);
+                newImgId += sfnr.toUser;
+                downloadedFile._id = newImgId;
+                await UploadFile(downloadedFile);
+                Console.WriteLine(downloadedFile._id);
+                return;
             });
         }
 
         [HttpGet]
         [Route("/init")]
-        public async void init() {
-            await client.PublishAsync(new ImageFile {
-                filetype = ".jpg",
-                data = "blabla"
-            });
-        }  
+        public void init() {
+           
+        }
 
         [HttpPost]
         [Route("UploadFile")]

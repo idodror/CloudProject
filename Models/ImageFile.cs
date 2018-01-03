@@ -27,7 +27,7 @@ namespace CloudProject.Models
         public string data { get; set; }    // file as Base64
 
         public ImageFileNoRev(ImageFile file) {
-            this._id = "id:" + file._id;
+            this._id = "imgname:" + file._id + ":user:Moris";
             this.filetype = file.filetype;
             this.data = file.data;
         }
